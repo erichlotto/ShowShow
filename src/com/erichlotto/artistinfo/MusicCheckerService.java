@@ -7,17 +7,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -28,6 +31,9 @@ public class MusicCheckerService extends Service {
 	String album;
 	String track;
 	private Context ctx;
+	private Location myLocation;
+	Handler handler;
+	Runnable updateData;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -39,7 +45,16 @@ public class MusicCheckerService extends Service {
 		iF.addAction("com.android.music.playbackcomplete");
 		iF.addAction("com.android.music.queuechanged");
 		registerReceiver(mReceiver, iF);
-
+		
+		handler = new Handler();
+		updateData = new Runnable(){
+		    public void run(){
+		    	getPosition();
+		    	handler.postDelayed(updateData,300000);
+		    }
+		};
+    	handler.post(updateData);
+    	
 		return Service.START_STICKY;
 	}
 
@@ -64,11 +79,14 @@ public class MusicCheckerService extends Service {
 			mNotifyMgr.notify(0, mBuilder.build());
 			
 			
-			
-			
-			
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
+			downloadConcertInfo();
+			
+		}
+		
+		
 
+		private void downloadConcertInfo() {
 			Thread trd = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -98,7 +116,7 @@ public class MusicCheckerService extends Service {
 						if (reader != null) {
 							try {
 								reader.close();
-								jsonParse(result);
+								jsonParseConcert(result);
 							} catch (IOException e) {
 								System.out.println(e.toString());
 							}
@@ -107,19 +125,31 @@ public class MusicCheckerService extends Service {
 				}
 			});
 			trd.start();
-
 		}
 	};
 	
-	private void jsonParse(String string){
+	
+	
+	private void jsonParseConcert(String string){
 		JSONObject response;
 		try {
 			response = new JSONObject(string);
 			JSONArray resultados = response.getJSONObject("events").getJSONArray("event");
 			for(int i=0; i<resultados.length(); i++){
-				String venue = resultados.getJSONObject(i).getJSONObject("venue").getString("name");
-				String date = DateFormatter.format(resultados.getJSONObject(i).getString("startDate"));
-				System.out.println("Show em "+venue+" no dia "+date);
+				JSONObject current = resultados.getJSONObject(i);
+				String venue = current.getJSONObject("venue").getString("name");
+				String date = DateFormatter.format(current.getString("startDate"));
+				Location concertLocation = new Location("");
+				String strLatitude = current.getJSONObject("venue").getJSONObject("location").getJSONObject("geo:point").getString("geo:lat");
+				String strLongitude = current.getJSONObject("venue").getJSONObject("location").getJSONObject("geo:point").getString("geo:long");
+				if(!strLatitude.equals("") && !strLongitude.equals("")){
+					double latitude = Double.parseDouble(strLatitude);
+					double longitude = Double.parseDouble(strLongitude);				
+					concertLocation.setLatitude(latitude);
+					concertLocation.setLongitude(longitude);
+					double distancia = calculaDistancia(myLocation, concertLocation);
+	//				System.out.println("Show em "+venue+" no dia "+date);
+				}
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -128,8 +158,30 @@ public class MusicCheckerService extends Service {
 		}
 	}
 	
-	private double calculaDistancia(){
-		return 0;
+	private void getPosition(){
+		// Acquire a reference to the system Location Manager
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		// Define a listener that responds to location updates
+		LocationListener locationListener = new LocationListener() {
+		    public void onLocationChanged(Location location) {
+		      // Called when a new location is found by the network location provider.
+		      myLocation=location;
+		    }
+		    public void onStatusChanged(String provider, int status, Bundle extras) {}
+		    public void onProviderEnabled(String provider) {}
+		    public void onProviderDisabled(String provider) {}
+		  };
+		// Register the listener with the Location Manager to receive location updates
+		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+	}
+	
+	private float calculaDistancia(Location loc1, Location loc2){
+		float[] results = new float[1];
+		Location.distanceBetween(
+                loc1.getLatitude(), loc1.getLongitude(),
+                loc2.getLatitude(), loc2.getLongitude(), results);
+		        System.out.println("Distance is: " + Math.round(results[0]));
+		return results[0];
 	}
 
 	@Override
