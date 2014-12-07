@@ -1,10 +1,9 @@
 package com.erichlotto.showshow;
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.view.Menu;
+import android.os.Bundle;
 
 public class MainActivity extends Activity {
 

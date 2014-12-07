@@ -1,15 +1,12 @@
 package com.erichlotto.showshow;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class MusicCheckerService extends Service {
@@ -53,12 +50,15 @@ public class MusicCheckerService extends Service {
 			Log.d("Music", artist + ":" + album + ":" + track);			
 	        if(intent.hasExtra("playing")) {
 	            if(intent.getBooleanExtra("playing", false)) {
-	                System.out.println("TOCANDO");
+	            	toastMan.start();
+	            	System.out.println("TOCANDO");
 	            } else {
+	            	toastMan.stop();
 	                System.out.println("PARADO");
 	            }
 	        }
-
+	        
+	        
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
 			ci.check(artist);
 			
@@ -67,6 +67,7 @@ public class MusicCheckerService extends Service {
 			
 			/* CHECAMOS A INFORMAÇÃO DA MUSICA */
 			ti.check(artist,track);
+	        
 		}
 	};
 
