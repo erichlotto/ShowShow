@@ -21,6 +21,7 @@ public class MusicCheckerService extends Service {
 	Runnable updateData;
 	ConcertInfo ci;
 	BandInfo bi;
+	TrackInfo ti;
 	ToastManager toastMan;
 
 	@Override
@@ -35,6 +36,7 @@ public class MusicCheckerService extends Service {
 		registerReceiver(mReceiver, iF);
 		ci = new ConcertInfo(this);
 		bi = new BandInfo(getApplicationContext(), toastMan);
+		ti = new TrackInfo(getApplicationContext(), toastMan);
 		return Service.START_STICKY;
 	}
 
@@ -62,6 +64,9 @@ public class MusicCheckerService extends Service {
 			
 			/* CHECAMOS A INFORMAÇÃO DA BANDA */
 			bi.check(artist);
+			
+			/* CHECAMOS A INFORMAÇÃO DA MUSICA */
+			ti.check(artist,track);
 		}
 	};
 
