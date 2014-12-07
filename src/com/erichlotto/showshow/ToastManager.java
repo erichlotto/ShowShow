@@ -20,10 +20,8 @@ public class ToastManager {
 		h = new Handler(ctx.getMainLooper());
 		frases = new ArrayList<String>();
 		handler = new Handler();
-		
 		updateData = new Runnable() {
 			public void run() {
-				
 				if(frases.size()> 0){
 					Random r = new Random();
 					showToast(ctx, frases.get(r.nextInt(frases.size())));
@@ -33,7 +31,6 @@ public class ToastManager {
 			}
 		};
 		handler.post(updateData);
-
 	}
 	
 	private static void showToast(final Context ctx, final String message){

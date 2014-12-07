@@ -3,7 +3,6 @@ package com.erichlotto.showshow;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 
 public class Splash extends Activity {
 	
@@ -14,7 +13,7 @@ public class Splash extends Activity {
 		Thread t = new Thread(){
 			public void run(){
 				try {
-					sleep(2000);
+					sleep(3000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

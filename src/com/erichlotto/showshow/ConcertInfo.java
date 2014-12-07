@@ -167,7 +167,7 @@ public class ConcertInfo {
 	private void trataNotificacao(double smallestDistance, String id, String artist, String venue, String date, String url) {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
-		long storedMaxDistance = sharedPref.getInt("SAVED_SCORE", defaultMaxDistance);
+		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
 		System.out.println(storedMaxDistance);
 		if(smallestDistance>storedMaxDistance || ViewedConcerts.isStored(ctx, id))return;
 		String encodedURL="";
