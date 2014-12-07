@@ -19,6 +19,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,7 +34,7 @@ public class ConcertInfo {
 	private Location myLocation;
 	Handler handler;
 	Runnable updateData;
-	Service ctx;
+	Context ctx;
 
 	public ConcertInfo(Service ctx) {
 		handler = new Handler();
@@ -179,6 +180,8 @@ public class ConcertInfo {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				ctx).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Show de " + artist)
+		        .setSmallIcon(R.drawable.notification_small_icon)
+		        .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.ic_launcher))
 				.setStyle(new NotificationCompat.BigTextStyle().bigText("Data: "+date+"\nLocal: "+venue+"\n(a "+smallestDistance+" metros)"))
 		        .setContentIntent(contentIntent)
 				.setContentText(date);

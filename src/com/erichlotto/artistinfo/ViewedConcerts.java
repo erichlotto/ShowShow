@@ -17,7 +17,7 @@ public class ViewedConcerts {
 	public static boolean store(Context ctx, String string){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString(KEY, ","+string+",");
+		if(!isStored(ctx,string))editor.putString(KEY, ","+string+",");
 		return editor.commit();
 	}
 
