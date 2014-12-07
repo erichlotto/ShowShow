@@ -20,6 +20,7 @@ public class MusicCheckerService extends Service {
 	Handler handler;
 	Runnable updateData;
 	ConcertInfo ci;
+	BandInfo bi;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -31,6 +32,7 @@ public class MusicCheckerService extends Service {
 		iF.addAction("com.android.music.queuechanged");
 		registerReceiver(mReceiver, iF);
 		ci = new ConcertInfo(this);
+		bi = new BandInfo(getApplicationContext());
 		return Service.START_STICKY;
 	}
 
@@ -48,6 +50,9 @@ public class MusicCheckerService extends Service {
 			
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
 			ci.check(artist);
+			
+			/* CHECAMOS A INFORMAÇÃO DA BANDA */
+			bi.check(artist);
 		}
 	};
 
