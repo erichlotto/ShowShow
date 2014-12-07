@@ -22,6 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+        <service
+            android:name="MusicCheckerService"
+            android:icon="@drawable/ic_launcher"
+            android:label="Serviço de checagem de musica" >
+        </service>
+        </application>
 
 </manifest>
