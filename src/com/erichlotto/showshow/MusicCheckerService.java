@@ -21,10 +21,12 @@ public class MusicCheckerService extends Service {
 	Runnable updateData;
 	ConcertInfo ci;
 	BandInfo bi;
+	ToastManager toastMan;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		System.out.println("MusicCheckerService iniciado");
+		toastMan = new ToastManager(getApplicationContext());
 		IntentFilter iF = new IntentFilter();
 		iF.addAction("com.android.music.metachanged");
 		iF.addAction("com.android.music.playstatechanged");
@@ -32,7 +34,7 @@ public class MusicCheckerService extends Service {
 		iF.addAction("com.android.music.queuechanged");
 		registerReceiver(mReceiver, iF);
 		ci = new ConcertInfo(this);
-		bi = new BandInfo(getApplicationContext());
+		bi = new BandInfo(getApplicationContext(), toastMan);
 		return Service.START_STICKY;
 	}
 

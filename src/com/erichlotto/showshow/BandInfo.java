@@ -23,30 +23,15 @@ public class BandInfo {
 	Handler handler;
 	Runnable updateData;
 	Context ctx;
-	static Handler h;
 	String infos[];
 	int index_infos;
+	private ToastManager toastMan;
 
-	public BandInfo(Context con) {
-		h = new Handler(con.getMainLooper());
+	public BandInfo(Context con, ToastManager toastMan) {
+		this.toastMan = toastMan;
 		this.ctx = con;
 		this.index_infos = 0;
 		this.infos = new String[]{};
-		handler = new Handler();
-		
-		updateData = new Runnable() {
-			public void run() {
-				
-				if((infos.length > 0) && (index_infos < infos.length)){
-					showToast(ctx,infos[index_infos]);
-					System.out.println(infos[index_infos]);
-					index_infos+=1;
-				}
-				handler.postDelayed(updateData, 10000);				
-			}
-		};
-		handler.post(updateData);
-		
 	}
 
 	public void check(final String artist) {
@@ -91,15 +76,6 @@ public class BandInfo {
 		});
 		trd.start();
 	}
-
-	private static void showToast(final Context ctx, final String message){
-		   h.post(new Runnable() {
-		       @Override
-		       public void run() {
-		            Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
-		       }
-		   });
-		}
 	
 	private void jsonParseConcert(String string) {
 		JSONObject response;
@@ -108,11 +84,7 @@ public class BandInfo {
 			String bio = response.getJSONObject("artist").getJSONObject("bio").getString("summary");
 			Document doc = Jsoup.parse(bio);
 			infos = doc.text().split("\\. ");
-			
-			System.out.println(infos[0]);
-
-			
-			
+			toastMan.adicionaFrases(infos);
 		} catch (JSONException e) {
 			e.printStackTrace();
 			System.out.println(e.toString());
