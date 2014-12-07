@@ -1,4 +1,4 @@
-package com.erichlotto.artistinfo;
+package com.erichlotto.showshow;
 
 import android.content.Context;
 import android.content.SharedPreferences;

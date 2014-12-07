@@ -1,4 +1,4 @@
-package com.erichlotto.artistinfo;
+package com.erichlotto.showshow;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -43,11 +43,18 @@ public class MusicCheckerService extends Service {
 			String action = intent.getAction();
 			String cmd = intent.getStringExtra("command");
 			Log.d("mIntentReceiver.onReceive ", action + " / " + cmd);
-			artist = intent.getStringExtra("artist");
-			album = intent.getStringExtra("album");
-			track = intent.getStringExtra("track");
+			if(intent.hasExtra("artist"))artist = intent.getStringExtra("artist");
+			if(intent.hasExtra("album"))album = intent.getStringExtra("album");
+			if(intent.hasExtra("track"))track = intent.getStringExtra("track");
 			Log.d("Music", artist + ":" + album + ":" + track);			
-			
+	        if(intent.hasExtra("playing")) {
+	            if(intent.getBooleanExtra("playing", false)) {
+	                System.out.println("TOCANDO");
+	            } else {
+	                System.out.println("PARADO");
+	            }
+	        }
+
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
 			ci.check(artist);
 			

@@ -1,4 +1,4 @@
-package com.erichlotto.artistinfo;
+package com.erichlotto.showshow;
 
 import java.io.BufferedReader;
 import java.io.IOException;

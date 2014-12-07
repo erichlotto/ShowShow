@@ -1,4 +1,4 @@
-package com.erichlotto.artistinfo;
+package com.erichlotto.showshow;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
