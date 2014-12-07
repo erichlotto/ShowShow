@@ -19,6 +19,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,7 +34,7 @@ public class ConcertInfo {
 	private Location myLocation;
 	Handler handler;
 	Runnable updateData;
-	Service ctx;
+	Context ctx;
 
 	public ConcertInfo(Service ctx) {
 		handler = new Handler();
@@ -129,9 +130,11 @@ public class ConcertInfo {
 			String venue = "";
 			String date = "";
 			String url = "";
+			String id = "";
 			for (int i = 0; i < resultados.length(); i++) {
 				JSONObject current = resultados.getJSONObject(i);
 				String _artist = current.getString("title");
+				String _id = current.getString("id");
 				String _venue = current.getJSONObject("venue").getString("name");
 				String _date = DateFormatter.format(current.getString("startDate"));
 				String _url = current.getJSONObject("venue").getString("website");
@@ -150,22 +153,23 @@ public class ConcertInfo {
 						venue = _venue;
 						date = _date;
 						url = _url;
+						id = _id;
 					}
 				}
 			}
-			trataNotificacao(Math.round(smallestDistance), artist, venue, date, url);
+			trataNotificacao(Math.round(smallestDistance), id, artist, venue, date, url);
 		} catch (JSONException e) {
 			e.printStackTrace();
 			System.out.println(e.toString());
 		}
 	}
 
-	private void trataNotificacao(double smallestDistance, String artist, String venue, String date, String url) {
+	private void trataNotificacao(double smallestDistance, String id, String artist, String venue, String date, String url) {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
 		long storedMaxDistance = sharedPref.getInt("SAVED_SCORE", defaultMaxDistance);
 		System.out.println(storedMaxDistance);
-		if(smallestDistance>storedMaxDistance)return;
+		if(smallestDistance>storedMaxDistance || ViewedConcerts.isStored(ctx, id))return;
 		String encodedURL="";
 		try {
 			encodedURL = URLEncoder.encode(url, "UTF-8");
@@ -176,12 +180,14 @@ public class ConcertInfo {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				ctx).setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("Show de " + artist)
+		        .setSmallIcon(R.drawable.notification_small_icon)
+		        .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.ic_launcher))
 				.setStyle(new NotificationCompat.BigTextStyle().bigText("Data: "+date+"\nLocal: "+venue+"\n(a "+smallestDistance+" metros)"))
 		        .setContentIntent(contentIntent)
 				.setContentText(date);
-
 		NotificationManager mNotifyMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotifyMgr.notify(0, mBuilder.build());		
+		mNotifyMgr.notify(0, mBuilder.build());
+		ViewedConcerts.store(ctx, id);
 	}
 
 	private float calculaDistancia(Location loc1, Location loc2) {
