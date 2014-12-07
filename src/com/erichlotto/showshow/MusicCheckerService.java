@@ -41,6 +41,7 @@ public class MusicCheckerService extends Service {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			toastMan.limpaFrases();
 			String action = intent.getAction();
 			String cmd = intent.getStringExtra("command");
 			Log.d("mIntentReceiver.onReceive ", action + " / " + cmd);
@@ -60,13 +61,15 @@ public class MusicCheckerService extends Service {
 	        
 	        
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
-			ci.check(artist);
+	        	ci.check(artist);
 			
 			/* CHECAMOS A INFORMAÇÃO DA BANDA */
-			bi.check(artist);
+		    if(SavedData.getStoredArtistDetailsFlag(context))
+	        	bi.check(artist);
 			
 			/* CHECAMOS A INFORMAÇÃO DA MUSICA */
-			ti.check(artist,track);
+	        if(SavedData.getStoredMusicDetailsFlag(context))
+	        	ti.check(artist,track);
 	        
 		}
 	};

@@ -3,9 +3,10 @@ package com.erichlotto.showshow;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ public class MainActivity extends Activity {
     private Intent i;
     TextView distancia_txt;
     SeekBar sb;
+    CheckBox cbArtista;
+    CheckBox cbMusica;
     int storedMaxDist;
     
 	@Override
@@ -26,12 +29,27 @@ public class MainActivity extends Activity {
 		i = new Intent(context, MusicCheckerService.class);
 		context.startService(i);
 		
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		int defaultMaxDistance = getResources().getInteger(R.integer.max_distance);
-		storedMaxDist = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
-		
+		storedMaxDist = SavedData.getStoredMaxDistance(this.context);
+		cbArtista = (CheckBox)findViewById(R.id.cb_artista);
+		cbMusica = (CheckBox)findViewById(R.id.cb_musica);
 		distancia_txt = (TextView)findViewById(R.id.distancia_txt);
 		updateSeekText(storedMaxDist);
+		
+		cbArtista.setChecked(SavedData.getStoredArtistDetailsFlag(context));
+		cbMusica.setChecked(SavedData.getStoredMusicDetailsFlag(context));
+		
+		cbArtista.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				SavedData.setStoredArtistDetailsFlag(context, isChecked);
+			}
+		});
+		cbMusica.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				SavedData.setStoredMusicDetailsFlag(context, isChecked);
+			}
+		});
 		
 		sb = (SeekBar)findViewById(R.id.distancia_sb);
 		sb.setProgress(storedMaxDist);
@@ -39,10 +57,7 @@ public class MainActivity extends Activity {
 			int prog;
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-				SharedPreferences.Editor editor = sharedPref.edit();
-				editor.putInt("STORED_MAX_DIST", prog);
-				editor.commit();
+				SavedData.storeMaxDistance(context, prog);
 			}
 			
 			@Override
@@ -56,13 +71,12 @@ public class MainActivity extends Activity {
 					boolean fromUser) {
 				prog=progress;
 				updateSeekText(progress);
-				
 			}
 		});
 	}
 	
 	private void updateSeekText(int position){
-		distancia_txt.setText(Math.round(position/1000)+" m");
+		distancia_txt.setText(position+" km");
 	}
 
 }

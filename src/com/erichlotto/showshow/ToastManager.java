@@ -41,9 +41,9 @@ public class ToastManager {
 	}
 	
 	private static void showToast(final Context ctx, final String message){
-		   h.post(new Runnable() {
+		   h.post(new Runnable(){
 		       @Override
-		       public void run() {
+		       public void run(){
 		            Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
 		       }
 		   });
@@ -66,5 +66,9 @@ public class ToastManager {
 		
 		showToast = true;
 		
+	}
+
+	public void limpaFrases() {
+		this.frases = new ArrayList<String>();
 	}
 }

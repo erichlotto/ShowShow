@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="100"
+                android:text="@integer/maximum_max_distance"
                 android:textColor="#897D87" />
         </LinearLayout>
 
@@ -68,6 +68,7 @@
             android:layout_height="60dp"
             android:layout_centerInParent="true"
             android:layout_marginTop="50dp"
+            android:layout_marginBottom="20dp"
             android:importantForAccessibility="no"
             android:src="@drawable/showshow_detalhes" />
 
@@ -75,15 +76,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
             android:paddingLeft="50dp"
             android:paddingRight="50dp" >
 
             <CheckBox
-                android:id="@+id/cb_album"
+                android:id="@+id/cb_artista"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="álbum"
+                android:text="Artista"
+                android:textSize="20dp"
                 android:textColor="#897D87" />
 
             <CheckBox
@@ -91,7 +94,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="música"
+                android:text="Música"
+                android:textSize="20dp"
                 android:textColor="#897D87" />
         </LinearLayout>
     </LinearLayout>
