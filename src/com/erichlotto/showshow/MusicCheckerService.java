@@ -50,12 +50,15 @@ public class MusicCheckerService extends Service {
 			Log.d("Music", artist + ":" + album + ":" + track);			
 	        if(intent.hasExtra("playing")) {
 	            if(intent.getBooleanExtra("playing", false)) {
-	                System.out.println("TOCANDO");
+	            	toastMan.start();
+	            	System.out.println("TOCANDO");
 	            } else {
+	            	toastMan.stop();
 	                System.out.println("PARADO");
 	            }
 	        }
-
+	        
+	        
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
 			ci.check(artist);
 			
@@ -64,6 +67,7 @@ public class MusicCheckerService extends Service {
 			
 			/* CHECAMOS A INFORMAÇÃO DA MUSICA */
 			ti.check(artist,track);
+	        
 		}
 	};
 

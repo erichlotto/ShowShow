@@ -1,8 +1,6 @@
 package com.erichlotto.showshow;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import android.content.Context;
@@ -17,23 +15,24 @@ public class ToastManager {
 	private Context ctx;
 	private static Handler h;
 	private int anterior = -1;
+	boolean showToast;
 	
 	public ToastManager(Context _ctx){
 		this.ctx = _ctx;
 		h = new Handler(ctx.getMainLooper());
 		frases = new ArrayList<String>();
 		handler = new Handler();
+		showToast = false;
 		updateData = new Runnable() {
 			public void run() {
 				int index = -1;
-				if(frases.size()> 0){
+				if((frases.size()> 0) && (showToast == true)){
 					Random r = new Random();
 					index = r.nextInt(frases.size());
-					while (index == anterior){
+					while ( index == anterior ){
 						index = r.nextInt(frases.size());
 					}
 					showToast(ctx, frases.get(index));
-					System.out.println(frases.toString());
 				}
 				handler.postDelayed(updateData, 10000);
 			}
@@ -55,5 +54,17 @@ public class ToastManager {
 			frases.add(frase);
 		}
 		System.out.println(this.frases.toString());
+	}
+	
+	public void stop(){
+	
+		showToast = false;
+		
+	}
+	
+	public void start(){
+		
+		showToast = true;
+		
 	}
 }
