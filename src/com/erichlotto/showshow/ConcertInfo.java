@@ -26,6 +26,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
@@ -80,7 +81,7 @@ public class ConcertInfo {
 					if (reader != null) {
 						try {
 							reader.close();
-							jsonParseConcert(result);
+							jsonParseConcert(result, artist);
 						} catch (IOException e) {
 							System.out.println(e.toString());
 						}
@@ -119,21 +120,21 @@ public class ConcertInfo {
 				LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 	}
 
-	private void jsonParseConcert(String string) {
+	private void jsonParseConcert(String string, String artist) {
 		JSONObject response;
 		try {
 			response = new JSONObject(string);
 			JSONArray resultados = response.getJSONObject("events")
 					.getJSONArray("event");
 			double smallestDistance =-1;
-			String artist = "";
+			String event = "";
 			String venue = "";
 			String date = "";
 			String url = "";
 			String id = "";
 			for (int i = 0; i < resultados.length(); i++) {
 				JSONObject current = resultados.getJSONObject(i);
-				String _artist = current.getString("title");
+				String _event = current.getString("title");
 				String _id = current.getString("id");
 				String _venue = current.getJSONObject("venue").getString("name");
 				String _date = DateFormatter.format(current.getString("startDate"));
@@ -149,7 +150,7 @@ public class ConcertInfo {
 					double distancia = calculaDistancia(myLocation, concertLocation);
 					if(distancia<smallestDistance || smallestDistance==-1){
 						smallestDistance=distancia;
-						artist = _artist;
+						event = _event;
 						venue = _venue;
 						date = _date;
 						url = _url;
@@ -157,14 +158,14 @@ public class ConcertInfo {
 					}
 				}
 			}
-			trataNotificacao(Math.round(smallestDistance), id, artist, venue, date, url);
+			trataNotificacao(Math.round(smallestDistance), id, artist, event, venue, date, url);
 		} catch (JSONException e) {
 			e.printStackTrace();
 			System.out.println(e.toString());
 		}
 	}
 
-	private void trataNotificacao(double smallestDistance, String id, String artist, String venue, String date, String url) {
+	private void trataNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url) {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
 		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
@@ -182,11 +183,11 @@ public class ConcertInfo {
 				.setContentTitle("Show de " + artist)
 		        .setSmallIcon(R.drawable.notification_small_icon)
 		        .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.ic_launcher))
-				.setStyle(new NotificationCompat.BigTextStyle().bigText("Data: "+date+"\nLocal: "+venue+"\n(a "+Math.round(smallestDistance/1000)+" km)"))
+				.setStyle(new NotificationCompat.BigTextStyle().bigText("Evento: "+event+"\nData: "+date+"\nLocal: "+venue+"\n(a "+Math.round(smallestDistance/1000)+" km)"))
 		        .setContentIntent(contentIntent)
 				.setContentText(date);
 		NotificationManager mNotifyMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotifyMgr.notify(0, mBuilder.build());
+		mNotifyMgr.notify(Math.round(SystemClock.uptimeMillis()/1000), mBuilder.build());
 		SavedData.storeId(ctx, id);
 	}
 
