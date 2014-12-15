@@ -13,7 +13,7 @@ public class Splash extends Activity {
 		Thread t = new Thread(){
 			public void run(){
 				try {
-					sleep(3000);
+					sleep(2000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

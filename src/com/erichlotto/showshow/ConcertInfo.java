@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,9 +37,11 @@ public class ConcertInfo {
 	Handler handler;
 	Runnable updateData;
 	Context ctx;
+	ArrayList<String>artistasChecados;
 
 	public ConcertInfo(Service ctx) {
 		handler = new Handler();
+		artistasChecados = new ArrayList<String>();
 		updateData = new Runnable() {
 			public void run() {
 				getPosition();
@@ -50,6 +53,7 @@ public class ConcertInfo {
 	}
 
 	public void check(final String artist) {
+		if(artistasChecados.contains(artist))return;
 		Thread trd = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -166,10 +170,12 @@ public class ConcertInfo {
 	}
 
 	private void trataNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url) {
+		artistasChecados.add(artist);
+		System.out.println("checou "+artist);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
 		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
-		System.out.println(storedMaxDistance);
+//		System.out.println(storedMaxDistance);
 		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdStored(ctx, id))return;
 		String encodedURL="";
 		try {

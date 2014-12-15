@@ -52,10 +52,10 @@ public class MusicCheckerService extends Service {
 	        if(intent.hasExtra("playing")) {
 	            if(intent.getBooleanExtra("playing", false)) {
 	            	toastMan.start();
-	            	System.out.println("TOCANDO");
+//	            	System.out.println("TOCANDO");
 	            } else {
 	            	toastMan.stop();
-	                System.out.println("PARADO");
+//	                System.out.println("PARADO");
 	            }
 	        }
 	        

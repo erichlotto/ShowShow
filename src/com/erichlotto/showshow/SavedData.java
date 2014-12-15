@@ -9,16 +9,21 @@ public class SavedData {
 	private static String KEY = "VIEWED_IDS";
 	
 	public static boolean isIdStored(Context ctx, String string){
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
-		String s = sharedPref.getString(KEY, "");
-		return s.contains(string);
+		String stored = getStoredIDs(ctx);
+		return stored.contains(string);
 	}
 	
 	public static boolean storeId(Context ctx, String string){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		SharedPreferences.Editor editor = sharedPref.edit();
-		if(!isIdStored(ctx,string))editor.putString(KEY, ","+string+",");
+		String stored = getStoredIDs(ctx);
+		if(!isIdStored(ctx,string))editor.putString(KEY, stored+","+string+",");
 		return editor.commit();
+	}
+	
+	private static String getStoredIDs(Context ctx){
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+		return sharedPref.getString(KEY, "");
 	}
 	
 	public static int getStoredMaxDistance(Context ctx){
