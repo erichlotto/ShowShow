@@ -37,11 +37,11 @@ public class ConcertInfo {
 	Handler handler;
 	Runnable updateData;
 	Context ctx;
-	ArrayList<String>artistasChecados;
+	ArrayList<Artista>artistasChecados;
 
 	public ConcertInfo(Service ctx) {
 		handler = new Handler();
-		artistasChecados = new ArrayList<String>();
+		artistasChecados = new ArrayList<Artista>();
 		updateData = new Runnable() {
 			public void run() {
 				getPosition();
@@ -53,7 +53,12 @@ public class ConcertInfo {
 	}
 
 	public void check(final String artist) {
-		if(artistasChecados.contains(artist))return;
+		long check_interval_in_millis = 86400000; //wait 1 day before checking again
+		for(Artista a:artistasChecados){
+			if(a.timestamp+check_interval_in_millis<System.currentTimeMillis())
+				artistasChecados.remove(a);
+			if(a.artist.equals(artist))return;
+		}
 		Thread trd = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -170,7 +175,7 @@ public class ConcertInfo {
 	}
 
 	private void trataNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url) {
-		artistasChecados.add(artist);
+		artistasChecados.add(new Artista(artist, System.currentTimeMillis()));
 		System.out.println("checou "+artist);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
@@ -202,6 +207,15 @@ public class ConcertInfo {
 		Location.distanceBetween(loc1.getLatitude(), loc1.getLongitude(),
 				loc2.getLatitude(), loc2.getLongitude(), results);
 		return results[0];
+	}
+	
+	class Artista{
+		String artist;
+		long timestamp;
+		public Artista(String artist2, long currentTimeMillis) {
+			this.artist = artist2;
+			this.timestamp = currentTimeMillis;
+		}
 	}
 
 }

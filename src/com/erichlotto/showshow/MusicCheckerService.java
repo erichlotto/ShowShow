@@ -20,9 +20,11 @@ public class MusicCheckerService extends Service {
 	BandInfo bi;
 	TrackInfo ti;
 	ToastManager toastMan;
+	int previousStoredMaxDist;//Precisamos verificar se o usuario alterou esse valor, para checar novamente os shows.
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		previousStoredMaxDist=SavedData.getStoredMaxDistance(this);
 		System.out.println("MusicCheckerService iniciado");
 		toastMan = new ToastManager(getApplicationContext());
 		IntentFilter iF = new IntentFilter();
@@ -41,6 +43,10 @@ public class MusicCheckerService extends Service {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if(previousStoredMaxDist != SavedData.getStoredMaxDistance(context)){
+				previousStoredMaxDist=SavedData.getStoredMaxDistance(context);
+				ci.artistasChecados.clear();
+			}
 			toastMan.limpaFrases();
 			String action = intent.getAction();
 			String cmd = intent.getStringExtra("command");
