@@ -133,8 +133,18 @@ public class ConcertInfo {
 		JSONObject response;
 		try {
 			response = new JSONObject(string);
-			JSONArray resultados = response.getJSONObject("events")
+			JSONArray resultados;
+			char c = string.charAt(19);
+			System.out.println(c);
+			if(c=='{'){//Pegamos um objeto, e nao um array
+				System.out.println("OBJETO");
+//				resultados=new JSONArray(response.getJSONObject("events").getJSONObject("event"));
+				resultados=new JSONArray();
+				resultados.put(response.getJSONObject("events").getJSONObject("event"));
+			}else{
+			resultados = response.getJSONObject("events")
 					.getJSONArray("event");
+			}
 			double smallestDistance =-1;
 			String event = "";
 			String venue = "";

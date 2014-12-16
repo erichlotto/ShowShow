@@ -10,7 +10,7 @@ public class SavedData {
 	
 	public static boolean isIdStored(Context ctx, String string){
 		String stored = getStoredIDs(ctx);
-		return stored.contains(string);
+		return stored.contains(","+string+",");
 	}
 	
 	public static boolean storeId(Context ctx, String string){
