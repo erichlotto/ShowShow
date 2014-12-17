@@ -8,16 +8,16 @@ public class SavedData {
 	
 	private static String KEY = "VIEWED_IDS";
 	
-	public static boolean isIdStored(Context ctx, String string){
+	public static boolean isIdAndArtistStored(Context ctx, String id, String artist){
 		String stored = getStoredIDs(ctx);
-		return stored.contains(","+string+",");
+		return stored.contains(","+id+artist+",");
 	}
 	
-	public static boolean storeId(Context ctx, String string){
+	public static boolean storeIdAndArtist(Context ctx, String id, String artist){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		SharedPreferences.Editor editor = sharedPref.edit();
 		String stored = getStoredIDs(ctx);
-		if(!isIdStored(ctx,string))editor.putString(KEY, stored+","+string+",");
+		if(!isIdAndArtistStored(ctx, id, artist))editor.putString(KEY, stored+","+id+artist+",");
 		return editor.commit();
 	}
 	
@@ -62,6 +62,13 @@ public class SavedData {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		SharedPreferences.Editor editor = sharedPref.edit();
 		editor.putBoolean("MUSIC_CURIOSITIES", b);
+		return editor.commit();
+	}
+
+	public static boolean clear(Context ctx) {
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString(KEY, "");
 		return editor.commit();
 	}
 

@@ -187,12 +187,13 @@ public class ConcertInfo {
 
 	private void trataNotificacao(final double smallestDistance, final String id, final String artist, final String event, final String venue, final String date, final String url) {
 		artistasChecados.add(new Artista(artist, System.currentTimeMillis()));
-		System.out.println("checou "+artist);
+		System.out.println("checou "+artist+" id="+id);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
 		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
 //		System.out.println(storedMaxDistance);
-		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdStored(ctx, id))return;
+
+		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdAndArtistStored(ctx, id, artist))return;
 		
 		/* PEGAMOS A IMAGEM DO ARTISTA */
 		
@@ -275,24 +276,6 @@ public class ConcertInfo {
 		});
 		trd.start();
 		
-/*		String encodedURL="";
-		try {
-			encodedURL = URLEncoder.encode(url, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-		}
-		Intent notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.equals("")?"http://www.google.com.br/?#q="+encodedURL:url));
-		PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, notificationIntent, 0);
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				ctx).setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle("Show de " + artist)
-		        .setSmallIcon(R.drawable.notification_small_icon)
-		        .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.ic_launcher))
-				.setStyle(new NotificationCompat.BigTextStyle().bigText("Evento: "+event+"\nData: "+date+"\nLocal: "+venue+"\n(a "+Math.round(smallestDistance/1000)+" km)"))
-		        .setContentIntent(contentIntent)
-				.setContentText(date);
-		NotificationManager mNotifyMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotifyMgr.notify(Math.round(SystemClock.uptimeMillis()/1000), mBuilder.build());
-		SavedData.storeId(ctx, id);*/
 	}
 	
 	private void mostraNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url, Bitmap image){
@@ -308,12 +291,12 @@ public class ConcertInfo {
 				.setContentTitle("Show de " + artist)
 		        .setSmallIcon(R.drawable.notification_small_icon)
 		        .setLargeIcon(image)
-				.setStyle(new NotificationCompat.BigTextStyle().bigText("Evento: "+event+"\nData: "+date+"\nLocal: "+venue+"\n(a "+Math.round(smallestDistance/1000)+" km)"))
+				.setStyle(new NotificationCompat.BigTextStyle().bigText("Evento: "+event+"\nData: "+date+"\nLocal: "+venue+" (a "+Math.round(smallestDistance/1000)+" km)"))
 		        .setContentIntent(contentIntent)
 				.setContentText(date);
 		NotificationManager mNotifyMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotifyMgr.notify(Math.round(SystemClock.uptimeMillis()/1000), mBuilder.build());
-		SavedData.storeId(ctx, id);
+		SavedData.storeIdAndArtist(ctx, id, artist);
 	}
 
 	private float calculaDistancia(Location loc1, Location loc2) {
