@@ -21,6 +21,8 @@ public class MusicCheckerService extends Service {
 	TrackInfo ti;
 	ToastManager toastMan;
 	int previousStoredMaxDist;//Precisamos verificar se o usuario alterou esse valor, para checar novamente os shows.
+	String previousArtist="";	// Precisamos filtrar para nao tentarmos pegar a informacao do mesmo artista simultaneamente
+	long previousCheckTime;	// mas se tiver passado meio minuto, podemos tentar
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -67,7 +69,11 @@ public class MusicCheckerService extends Service {
 	        
 	        
 			/* CHECAMOS SE HÁ EVENTOS PARA O ARTISTA */
-	        	ci.check(artist);
+	        if(!previousArtist.equals(artist) || previousCheckTime+30000<System.currentTimeMillis()){
+	        	previousArtist = artist;
+	        	previousCheckTime = System.currentTimeMillis();
+		        ci.check(artist);
+	        }
 			
 			/* CHECAMOS A INFORMAÇÃO DA BANDA */
 		    if(SavedData.getStoredArtistDetailsFlag(context))
@@ -76,7 +82,6 @@ public class MusicCheckerService extends Service {
 			/* CHECAMOS A INFORMAÇÃO DA MUSICA */
 	        if(SavedData.getStoredMusicDetailsFlag(context))
 	        	ti.check(artist,track);
-	        
 		}
 	};
 

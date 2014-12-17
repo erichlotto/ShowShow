@@ -20,6 +20,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
@@ -184,7 +185,7 @@ public class ConcertInfo {
 		}
 	}
 
-	private void trataNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url) {
+	private void trataNotificacao(final double smallestDistance, final String id, final String artist, final String event, final String venue, final String date, final String url) {
 		artistasChecados.add(new Artista(artist, System.currentTimeMillis()));
 		System.out.println("checou "+artist);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -192,7 +193,89 @@ public class ConcertInfo {
 		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
 //		System.out.println(storedMaxDistance);
 		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdStored(ctx, id))return;
-		String encodedURL="";
+		
+		/* PEGAMOS A IMAGEM DO ARTISTA */
+		
+		Thread trd = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// code to do the HTTP request
+				try {
+					URL url = new URL(
+							"http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist="
+									+ URLEncoder.encode(artist, "UTF-8")
+									+ "&api_key=4a7e24f35563d05d6b8283ba766afb78&format=json");
+					HttpURLConnection con = (HttpURLConnection) url
+							.openConnection();
+					readStream(con.getInputStream());
+				} catch (Exception e) {
+				}
+			}
+
+			private void readStream(InputStream in) {
+				String result = "";
+				BufferedReader reader = null;
+				try {
+					reader = new BufferedReader(new InputStreamReader(in));
+					String line = "";
+					while ((line = reader.readLine()) != null) {
+						result += line;
+					}
+				} catch (IOException e) {
+					System.out.println(e.toString());
+				} finally {
+					if (reader != null) {
+						try {
+							reader.close();
+							System.out.println("CARREGOU");
+							try {
+								JSONObject response = new JSONObject(result);
+								String imgURL = response.getJSONObject("artist")
+										.getJSONArray("image").getJSONObject(3).getString("#text");
+								System.out.println(imgURL);
+								URL bandUrl = new URL(imgURL);
+								Bitmap srcBmp = BitmapFactory.decodeStream(bandUrl.openConnection().getInputStream());
+								Bitmap dstBmp;
+								if (srcBmp.getWidth() >= srcBmp.getHeight()){
+
+									  dstBmp = Bitmap.createBitmap(
+									     srcBmp, 
+									     srcBmp.getWidth()/2 - srcBmp.getHeight()/2,
+									     0,
+									     srcBmp.getHeight(), 
+									     srcBmp.getHeight()
+									     );
+
+									}else{
+
+									  dstBmp = Bitmap.createBitmap(
+									     srcBmp,
+									     0, 
+									     srcBmp.getHeight()/2 - srcBmp.getWidth()/2,
+									     srcBmp.getWidth(),
+									     srcBmp.getWidth() 
+									     );
+									}
+								
+								
+								mostraNotificacao(smallestDistance, id, artist, event, venue, date, url, dstBmp);
+
+							} catch (JSONException e) {
+								Bitmap image = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.ic_launcher);
+								mostraNotificacao(smallestDistance, id, artist, event, venue, date, url, image);
+							}
+
+							jsonParseConcert(result, artist);
+						} catch (IOException e) {
+							System.out.println(e.toString());
+						}
+					}
+				}
+			}
+		});
+		trd.start();
+		
+/*		String encodedURL="";
 		try {
 			encodedURL = URLEncoder.encode(url, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -204,6 +287,27 @@ public class ConcertInfo {
 				.setContentTitle("Show de " + artist)
 		        .setSmallIcon(R.drawable.notification_small_icon)
 		        .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.ic_launcher))
+				.setStyle(new NotificationCompat.BigTextStyle().bigText("Evento: "+event+"\nData: "+date+"\nLocal: "+venue+"\n(a "+Math.round(smallestDistance/1000)+" km)"))
+		        .setContentIntent(contentIntent)
+				.setContentText(date);
+		NotificationManager mNotifyMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotifyMgr.notify(Math.round(SystemClock.uptimeMillis()/1000), mBuilder.build());
+		SavedData.storeId(ctx, id);*/
+	}
+	
+	private void mostraNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url, Bitmap image){
+		String encodedURL="";
+		try {
+			encodedURL = URLEncoder.encode(url, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		Intent notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.equals("")?"http://www.google.com.br/?#q="+encodedURL:url));
+		PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0, notificationIntent, 0);
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				ctx).setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("Show de " + artist)
+		        .setSmallIcon(R.drawable.notification_small_icon)
+		        .setLargeIcon(image)
 				.setStyle(new NotificationCompat.BigTextStyle().bigText("Evento: "+event+"\nData: "+date+"\nLocal: "+venue+"\n(a "+Math.round(smallestDistance/1000)+" km)"))
 		        .setContentIntent(contentIntent)
 				.setContentText(date);
