@@ -186,12 +186,12 @@ public class ConcertInfo {
 
 	private void trataNotificacao(double smallestDistance, String id, String artist, String event, String venue, String date, String url) {
 		artistasChecados.add(new Artista(artist, System.currentTimeMillis()));
-		System.out.println("checou "+artist);
+		System.out.println("checou "+artist+" id="+id);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
 		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
 //		System.out.println(storedMaxDistance);
-		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdStored(ctx, id))return;
+		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdAndArtistStored(ctx, id, artist))return;
 		String encodedURL="";
 		try {
 			encodedURL = URLEncoder.encode(url, "UTF-8");
@@ -209,7 +209,7 @@ public class ConcertInfo {
 				.setContentText(date);
 		NotificationManager mNotifyMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotifyMgr.notify(Math.round(SystemClock.uptimeMillis()/1000), mBuilder.build());
-		SavedData.storeId(ctx, id);
+		SavedData.storeIdAndArtist(ctx, id, artist);
 	}
 
 	private float calculaDistancia(Location loc1, Location loc2) {
