@@ -30,6 +30,7 @@ public class MusicCheckerService extends Service {
 		System.out.println("MusicCheckerService iniciado");
 		toastMan = new ToastManager(getApplicationContext());
 		IntentFilter iF = new IntentFilter();
+		iF.addAction("com.spotify.music.metadatachanged");
 		iF.addAction("com.android.music.metachanged");
 		iF.addAction("com.android.music.playstatechanged");
 		iF.addAction("com.android.music.playbackcomplete");
