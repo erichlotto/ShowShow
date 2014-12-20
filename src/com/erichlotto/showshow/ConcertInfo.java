@@ -187,13 +187,13 @@ public class ConcertInfo {
 
 	private void trataNotificacao(final double smallestDistance, final String id, final String artist, final String event, final String venue, final String date, final String url) {
 		artistasChecados.add(new Artista(artist, System.currentTimeMillis()));
-		System.out.println("checou "+artist+" id="+id);
+		System.out.println("checou "+artist+" id="+id+" distance="+smallestDistance);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(ctx);
 		int defaultMaxDistance = ctx.getResources().getInteger(R.integer.max_distance);
 		long storedMaxDistance = sharedPref.getInt("STORED_MAX_DIST", defaultMaxDistance);
 //		System.out.println(storedMaxDistance);
 
-		if(smallestDistance>storedMaxDistance*1000 || SavedData.isIdAndArtistStored(ctx, id, artist))return;
+		if(smallestDistance>storedMaxDistance*1000 || smallestDistance==-1 || SavedData.isIdAndArtistStored(ctx, id, artist))return;
 		
 		/* PEGAMOS A IMAGEM DO ARTISTA */
 		

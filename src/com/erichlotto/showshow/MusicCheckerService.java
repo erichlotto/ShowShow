@@ -30,11 +30,38 @@ public class MusicCheckerService extends Service {
 		System.out.println("MusicCheckerService iniciado");
 		toastMan = new ToastManager(getApplicationContext());
 		IntentFilter iF = new IntentFilter();
+		
+		//PowerAMP - quebrando
+//		iF.addAction("com.maxmpz.audioplayer.TRACK_CHANGED");
+//		iF.addAction("com.maxmpz.audioplayer.STATUS_CHANGED");
+		
+		//HTC (needs testing)
+		iF.addAction("com.htc.music.metachanged");
+		
+		//Samsung (needs testing)
+		iF.addAction("com.samsung.sec.android.MusicPlayer.metachanged");
+		iF.addAction("com.samsung.music.metachanged");
+		iF.addAction("com.samsung.sec.metachanged");
+		iF.addAction("com.samsung.sec.android.metachanged");
+		iF.addAction("com.samsung.MusicPlayer.metachanged");
+		
+		//PlayerPro
+		iF.addAction("com.tbig.playerpro.metachanged");
+		iF.addAction("com.tbig.playerpro.playstatechanged");
+		iF.addAction("com.tbig.playerprotrial.metachanged");
+		iF.addAction("com.tbig.playerprotrial.playstatechanged");
+/*		iF.addAction("com.tbig.playerpro.playbackcomplete");
+		iF.addAction("com.tbig.playerpro.queuechanged");*/
+
+		//Spotify
 		iF.addAction("com.spotify.music.metadatachanged");
+		iF.addAction("com.spotify.music.playbackstatechanged");
+		
+		//Default android intents
 		iF.addAction("com.android.music.metachanged");
 		iF.addAction("com.android.music.playstatechanged");
-		iF.addAction("com.android.music.playbackcomplete");
-		iF.addAction("com.android.music.queuechanged");
+/*		iF.addAction("com.android.music.playbackcomplete");
+		iF.addAction("com.android.music.queuechanged");*/
 		registerReceiver(mReceiver, iF);
 		ci = new ConcertInfo(this);
 		bi = new BandInfo(getApplicationContext(), toastMan);
